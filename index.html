@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#f7f4ee">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="22.04">
+<title>22.04 · 私人刊物</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --paper:#f7f4ee;
+  --paper2:#f0ece3;
+  --ink:#1a1714;
+  --ink2:#4a4540;
+  --ink3:#8a837a;
+  --rule:#c8c0b4;
+  --accent:#8b6914;
+}
+html,body{background:var(--paper);min-height:100vh;font-family:'Georgia',serif;color:var(--ink)}
+.app{max-width:680px;margin:0 auto;min-height:100vh}
+
+/* topbar */
+.topbar{background:var(--paper);border-bottom:2px solid var(--ink);padding:1.5rem 1.25rem 1rem;text-align:center;position:relative}
+.pub-name{font-size:38px;font-weight:500;letter-spacing:0.18em;color:var(--ink);font-family:sans-serif}
+.pub-rule{display:flex;align-items:center;gap:8px;justify-content:center;margin:8px 0}
+.pub-rule span{height:0.5px;background:var(--ink);flex:1;max-width:80px}
+.pub-tagline{font-size:10px;letter-spacing:0.25em;color:var(--ink2);font-family:sans-serif}
+.pub-date{font-size:10px;color:var(--ink3);margin-top:6px;font-family:sans-serif;letter-spacing:0.1em}
+.admin-btn{position:absolute;top:1rem;right:1rem;font-size:10px;letter-spacing:0.1em;color:var(--ink3);cursor:pointer;border:0.5px solid var(--rule);padding:4px 10px;font-family:sans-serif;background:transparent}
+.admin-btn:hover{color:var(--ink);border-color:var(--ink2)}
+
+/* issue strip */
+.issue-strip{display:flex;justify-content:space-between;padding:6px 1.25rem;border-bottom:0.5px solid var(--rule);font-size:10px;letter-spacing:0.12em;color:var(--ink3);font-family:sans-serif;background:var(--paper2)}
+
+/* featured */
+.featured{padding:1.5rem 1.25rem;border-bottom:1px solid var(--rule);cursor:pointer}
+.feat-label{font-size:9px;letter-spacing:0.3em;color:var(--accent);margin-bottom:10px;font-family:sans-serif}
+.feat-title{font-size:22px;font-weight:500;line-height:1.3;color:var(--ink);margin-bottom:10px}
+.featured:hover .feat-title{color:var(--ink2)}
+.feat-excerpt{font-size:14px;color:var(--ink2);line-height:1.75}
+
+/* article list */
+.article-list{padding:0 1.25rem}
+.art-card{border-bottom:0.5px solid var(--rule);padding:1.1rem 0;cursor:pointer;display:grid;grid-template-columns:1fr auto;gap:8px;align-items:start}
+.art-num{font-size:9px;letter-spacing:0.2em;color:var(--ink3);font-family:sans-serif;margin-bottom:5px}
+.art-title{font-size:16px;font-weight:500;line-height:1.35;color:var(--ink);margin-bottom:5px}
+.art-card:hover .art-title{color:var(--ink2)}
+.art-excerpt{font-size:13px;color:var(--ink2);line-height:1.6}
+.art-tag{font-size:9px;letter-spacing:0.15em;border:0.5px solid var(--rule);padding:2px 6px;color:var(--ink3);font-family:sans-serif;margin-top:6px;display:inline-block}
+.art-date{font-size:10px;color:var(--ink3);font-family:sans-serif;white-space:nowrap;padding-top:4px}
+.empty-state{text-align:center;padding:3rem 1rem;color:var(--ink3);font-size:13px;font-family:sans-serif;letter-spacing:0.05em}
+.footer{text-align:center;padding:1.5rem;font-size:9px;letter-spacing:0.2em;color:var(--ink3);font-family:sans-serif;border-top:2px solid var(--ink);margin-top:1rem}
+
+/* reader */
+#reader{display:none;padding:0 1.25rem;background:var(--paper);min-height:100vh}
+.back{display:block;padding:1rem 0;font-size:10px;letter-spacing:0.15em;color:var(--ink3);cursor:pointer;border-bottom:0.5px solid var(--rule);margin-bottom:1.5rem;font-family:sans-serif}
+.back:hover{color:var(--ink)}
+.r-cat{font-size:9px;letter-spacing:0.3em;color:var(--accent);margin-bottom:10px;font-family:sans-serif}
+.r-title{font-size:24px;font-weight:500;line-height:1.3;color:var(--ink);margin-bottom:8px}
+.r-date{font-size:10px;color:var(--ink3);font-family:sans-serif;letter-spacing:0.1em;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:0.5px solid var(--rule)}
+.r-body{font-size:16px;line-height:1.9;color:var(--ink)}
+.r-body p{margin-bottom:1.25rem}
+
+/* admin */
+#admin{display:none;padding:1.25rem;background:var(--paper);min-height:100vh}
+.admin-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;padding-bottom:1rem;border-bottom:1px solid var(--rule)}
+.admin-header h2{font-size:13px;letter-spacing:0.15em;font-family:sans-serif;color:var(--ink)}
+.close-btn{font-size:10px;color:var(--ink3);cursor:pointer;font-family:sans-serif;letter-spacing:0.1em;border:0.5px solid var(--rule);padding:4px 10px}
+.close-btn:hover{color:var(--ink)}
+.form-row{margin-bottom:1rem}
+.form-label{font-size:10px;letter-spacing:0.15em;color:var(--ink3);font-family:sans-serif;display:block;margin-bottom:5px}
+.form-row input,.form-row textarea{width:100%;background:var(--paper2);border:0.5px solid var(--rule);padding:8px 10px;font-size:14px;color:var(--ink);font-family:'Georgia',serif;outline:none;-webkit-appearance:none;border-radius:0}
+.form-row input:focus,.form-row textarea:focus{border-color:var(--ink2)}
+.form-row textarea{min-height:180px;resize:vertical;line-height:1.7}
+.pub-submit{background:var(--ink);color:var(--paper);border:none;padding:10px 28px;font-size:11px;letter-spacing:0.2em;cursor:pointer;font-family:sans-serif}
+.pub-submit:hover{background:var(--ink2)}
+.article-mgr{margin-top:1.5rem;border-top:0.5px solid var(--rule);padding-top:1rem}
+.mgr-label{font-size:10px;letter-spacing:0.2em;color:var(--ink3);font-family:sans-serif;margin-bottom:10px}
+.mgr-item{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:0.5px solid var(--rule);font-size:13px;color:var(--ink2)}
+.del-btn{font-size:10px;color:var(--ink3);cursor:pointer;font-family:sans-serif;flex-shrink:0;margin-left:12px}
+.del-btn:hover{color:#c0392b}
+
+/* pwa banner */
+.pwa-banner{background:var(--paper2);border-bottom:0.5px solid var(--rule);padding:8px 1.25rem;font-size:11px;color:var(--ink3);font-family:sans-serif;display:flex;align-items:center;justify-content:space-between}
+.pwa-banner span{letter-spacing:0.05em}
+.pwa-close{cursor:pointer;color:var(--ink3);font-size:14px}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- HOME -->
+  <div id="home">
+    <div id="pwa-banner" class="pwa-banner" style="display:none">
+      <span>在Safari中点击分享按钮 → 添加到主屏幕，即可像App一样使用</span>
+      <span class="pwa-close" onclick="document.getElementById('pwa-banner').style.display='none'">×</span>
+    </div>
+    <div class="topbar">
+      <button class="admin-btn" onclick="showAdmin()">编辑后台</button>
+      <div class="pub-name">22.04</div>
+      <div class="pub-rule"><span></span><div class="pub-tagline">私人刊物</div><span></span></div>
+      <div class="pub-date" id="today"></div>
+    </div>
+    <div class="issue-strip">
+      <span id="issue-num">第 1 期</span>
+      <span id="art-count">共 0 篇</span>
+    </div>
+    <div id="featured-block"></div>
+    <div class="article-list" id="article-list"></div>
+    <div class="footer">22.04 · 私人刊物</div>
+  </div>
+
+  <!-- READER -->
+  <div id="reader">
+    <div class="topbar" style="padding:1rem 1.25rem">
+      <div class="pub-name" style="font-size:22px">22.04</div>
+    </div>
+    <div style="padding:0 1.25rem">
+      <span class="back" onclick="goHome()">← 返回目录</span>
+      <div class="r-cat" id="r-cat"></div>
+      <div class="r-title" id="r-title"></div>
+      <div class="r-date" id="r-date"></div>
+      <div class="r-body" id="r-body"></div>
+    </div>
+    <div class="footer" style="margin-top:2rem">22.04 · 私人刊物</div>
+  </div>
+
+  <!-- ADMIN -->
+  <div id="admin">
+    <div class="admin-header">
+      <h2>编辑后台 · 22.04</h2>
+      <button class="close-btn" onclick="goHome()">← 返回刊物</button>
+    </div>
+    <div class="form-row">
+      <label class="form-label">标题</label>
+      <input type="text" id="f-title" placeholder="文章标题">
+    </div>
+    <div class="form-row">
+      <label class="form-label">栏目标签</label>
+      <input type="text" id="f-tag" placeholder="随笔、读书、科技……">
+    </div>
+    <div class="form-row">
+      <label class="form-label">摘要（首页预览，选填）</label>
+      <input type="text" id="f-excerpt" placeholder="留空则自动取正文开头">
+    </div>
+    <div class="form-row">
+      <label class="form-label">正文（空行分段）</label>
+      <textarea id="f-body" placeholder="在这里写你的文章……"></textarea>
+    </div>
+    <button class="pub-submit" onclick="publishArticle()">发 布</button>
+    <div class="article-mgr">
+      <div class="mgr-label">已发布文章</div>
+      <div id="mgr-list"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+var articles = [];
+try{ articles = JSON.parse(localStorage.getItem('2204_v1') || '[]'); }catch(e){}
+
+if(articles.length === 0){
+  articles = [{
+    id: 1,
+    title: "第一期，关于开始",
+    tag: "随笔",
+    excerpt: "一份刊物从第一篇文章开始。这里什么都可以写，什么都不必写。",
+    body: "一份刊物从第一篇文章开始。\n\n这里什么都可以写，什么都不必写。重要的是它存在——一个只属于自己的角落，不计流量，不看转发，只是认真地把想说的话写下来。\n\n欢迎来到 22.04。",
+    date: "2024年4月"
+  }];
+  save();
+}
+
+function save(){ try{ localStorage.setItem('2204_v1', JSON.stringify(articles)); }catch(e){} }
+
+function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function fmtDate(d){ return d || new Date().toLocaleDateString('zh-CN',{year:'numeric',month:'long'}); }
+
+document.getElementById('today').textContent = new Date().toLocaleDateString('zh-CN',{year:'numeric',month:'long',day:'numeric',weekday:'long'});
+
+// show PWA hint on iOS Safari
+if(/iphone|ipad|ipod/i.test(navigator.userAgent) && !window.navigator.standalone){
+  document.getElementById('pwa-banner').style.display = 'flex';
+}
+
+function render(){
+  var n = articles.length;
+  document.getElementById('issue-num').textContent = '第 1 期';
+  document.getElementById('art-count').textContent = '共 ' + n + ' 篇';
+
+  var fb = document.getElementById('featured-block');
+  var al = document.getElementById('article-list');
+
+  if(n === 0){
+    fb.innerHTML = '<div class="empty-state">还没有文章，点右上角「编辑后台」发布第一篇吧</div>';
+    al.innerHTML = '';
+    return;
+  }
+
+  var lead = articles[n-1];
+  fb.innerHTML = '<div class="featured" onclick="openArticle('+(n-1)+')">'
+    + '<div class="feat-label">本期主文 · LEAD STORY</div>'
+    + '<div class="feat-title">' + esc(lead.title) + '</div>'
+    + '<div class="feat-excerpt">' + esc(lead.excerpt) + '</div>'
+    + '</div>';
+
+  var html = '';
+  for(var i = n-2; i >= 0; i--){
+    var a = articles[i];
+    html += '<div class="art-card" onclick="openArticle('+i+')">'
+      + '<div><div class="art-num">' + (a.tag ? esc(a.tag.toUpperCase()) + ' · ' : '') + fmtDate(a.date) + '</div>'
+      + '<div class="art-title">' + esc(a.title) + '</div>'
+      + '<div class="art-excerpt">' + esc(a.excerpt) + '</div>'
+      + (a.tag ? '<span class="art-tag">' + esc(a.tag) + '</span>' : '')
+      + '</div><div class="art-date">' + fmtDate(a.date) + '</div></div>';
+  }
+  al.innerHTML = html;
+}
+
+function openArticle(i){
+  var a = articles[i];
+  document.getElementById('r-cat').textContent = (a.tag || '').toUpperCase();
+  document.getElementById('r-title').textContent = a.title;
+  document.getElementById('r-date').textContent = fmtDate(a.date);
+  document.getElementById('r-body').innerHTML = a.body.split(/\n\n+/).filter(function(l){ return l.trim(); }).map(function(l){ return '<p>' + esc(l.trim()) + '</p>'; }).join('');
+  document.getElementById('home').style.display = 'none';
+  document.getElementById('reader').style.display = 'block';
+  document.getElementById('admin').style.display = 'none';
+  window.scrollTo(0,0);
+}
+
+function goHome(){
+  document.getElementById('home').style.display = 'block';
+  document.getElementById('reader').style.display = 'none';
+  document.getElementById('admin').style.display = 'none';
+  window.scrollTo(0,0);
+  render();
+}
+
+function showAdmin(){
+  document.getElementById('home').style.display = 'none';
+  document.getElementById('reader').style.display = 'none';
+  document.getElementById('admin').style.display = 'block';
+  window.scrollTo(0,0);
+  renderMgr();
+}
+
+function publishArticle(){
+  var title = document.getElementById('f-title').value.trim();
+  var tag = document.getElementById('f-tag').value.trim();
+  var excerpt = document.getElementById('f-excerpt').value.trim();
+  var body = document.getElementById('f-body').value.trim();
+  if(!title){ alert('请填写标题'); return; }
+  if(!body){ alert('请填写正文'); return; }
+  if(!excerpt) excerpt = body.replace(/\n/g,' ').slice(0,60) + '……';
+  articles.push({
+    id: Date.now(),
+    title: title,
+    tag: tag,
+    excerpt: excerpt,
+    body: body,
+    date: new Date().toLocaleDateString('zh-CN',{year:'numeric',month:'long'})
+  });
+  save();
+  document.getElementById('f-title').value = '';
+  document.getElementById('f-tag').value = '';
+  document.getElementById('f-excerpt').value = '';
+  document.getElementById('f-body').value = '';
+  renderMgr();
+  alert('发布成功！');
+}
+
+function deleteArticle(i){
+  if(!confirm('确认删除《' + articles[i].title + '》？')) return;
+  articles.splice(i, 1);
+  save();
+  renderMgr();
+}
+
+function renderMgr(){
+  var el = document.getElementById('mgr-list');
+  if(articles.length === 0){
+    el.innerHTML = '<div style="font-size:12px;color:var(--ink3);padding:8px 0;font-family:sans-serif">暂无文章</div>';
+    return;
+  }
+  el.innerHTML = articles.map(function(a,i){
+    return '<div class="mgr-item"><span>' + esc(a.title) + '</span><span class="del-btn" onclick="deleteArticle('+i+')">删除</span></div>';
+  }).join('');
+}
+
+render();
+</script>
+</body>
+</html>
