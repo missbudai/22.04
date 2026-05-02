@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>写文章 & 分享</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, 'PingFang SC', sans-serif;
+      background: #f5f5f5;
+      color: #333;
+    }
+    header {
+      background: #1a4a3a;
+      color: #fff;
+      padding: 16px 18px;
+      font-size: 17px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    header span { font-size: 13px; color: rgba(255,255,255,0.6); font-weight: 400; }
+    .editor {
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    #title-input {
+      width: 100%;
+      font-size: 22px;
+      font-weight: 700;
+      border: none;
+      background: #fff;
+      border-radius: 12px;
+      padding: 16px;
+      outline: none;
+      color: #1a1a1a;
+    }
+    #title-input::placeholder { color: #ccc; }
+    #body-input {
+      width: 100%;
+      min-height: 220px;
+      font-size: 16px;
+      line-height: 1.8;
+      border: none;
+      background: #fff;
+      border-radius: 12px;
+      padding: 16px;
+      outline: none;
+      resize: none;
+      color: #333;
+    }
+    #body-input::placeholder { color: #ccc; }
+    .upload-area {
+      background: #fff;
+      border-radius: 12px;
+      padding: 18px;
+    }
+    .upload-area label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 15px;
+      color: #1a4a3a;
+      font-weight: 600;
+      cursor: pointer;
+      margin-bottom: 12px;
+    }
+    .upload-area label .icon {
+      width: 36px; height: 36px;
+      background: #e6f4ec;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+    }
+    #img-input { display: none; }
+    #img-preview {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .prev-img {
+      position: relative;
+      width: calc(33.33% - 7px);
+      aspect-ratio: 1;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .prev-img img { width: 100%; height: 100%; object-fit: cover; }
+    .prev-img .del {
+      position: absolute;
+      top: 4px; right: 4px;
+      background: rgba(0,0,0,0.5);
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 22px; height: 22px;
+      font-size: 13px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .actions {
+      padding: 0 18px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .btn-preview {
+      width: 100%;
+      padding: 15px;
+      background: #fff;
+      color: #1a4a3a;
+      font-size: 16px;
+      font-weight: 600;
+      border: 2px solid #1a4a3a;
+      border-radius: 12px;
+      cursor: pointer;
+    }
+    .btn-share {
+      width: 100%;
+      padding: 15px;
+      background: #07c160;
+      color: #fff;
+      font-size: 16px;
+      font-weight: 700;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    #preview-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: #fff;
+      z-index: 100;
+      overflow-y: auto;
+    }
+    .modal-header {
+      background: #1a4a3a;
+      color: #fff;
+      padding: 14px 18px;
+      font-size: 15px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+    }
+    .modal-close {
+      background: rgba(255,255,255,0.2);
+      border: none;
+      color: #fff;
+      border-radius: 999px;
+      padding: 6px 14px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .modal-body { padding: 24px 18px 40px; }
+    .modal-body h1 {
+      font-size: 24px;
+      font-weight: 700;
+      color: #1a1a1a;
+      line-height: 1.4;
+      margin-bottom: 18px;
+    }
+    .modal-body .article-text {
+      font-size: 16px;
+      line-height: 1.9;
+      color: #333;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .modal-body .article-imgs {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 20px;
+    }
+    .modal-body .article-imgs img { width: 100%; border-radius: 10px; }
+    #share-tip {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 200;
+      align-items: flex-end;
+      justify-content: center;
+    }
+    #share-tip.show { display: flex; }
+    .share-tip-box {
+      background: #fff;
+      border-radius: 20px 20px 0 0;
+      padding: 28px 24px 40px;
+      width: 100%;
+      text-align: center;
+    }
+    .share-tip-box .arrow-img { font-size: 48px; margin-bottom: 14px; }
+    .share-tip-box h3 { font-size: 18px; font-weight: 700; color: #1a1a1a; margin-bottom: 10px; }
+    .share-tip-box p { font-size: 14px; color: #888; line-height: 1.7; margin-bottom: 20px; }
+    .share-tip-close {
+      background: #f0f0f0;
+      border: none;
+      border-radius: 999px;
+      padding: 12px 36px;
+      font-size: 15px;
+      color: #333;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    📝 写文章
+    <span>填写后点击分享</span>
+  </header>
+
+  <div class="editor">
+    <input id="title-input" type="text" placeholder="文章标题（点击输入）">
+    <textarea id="body-input" placeholder="在这里写下你的文章内容……"></textarea>
+    <div class="upload-area">
+      <label for="img-input">
+        <div class="icon">🖼️</div>
+        添加图片（可多选）
+      </label>
+      <input id="img-input" type="file" accept="image/*" multiple>
+      <div id="img-preview"></div>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button class="btn-preview" onclick="showPreview()">👁️ 预览文章</button>
+    <button class="btn-share" onclick="showShareTip()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+        <path d="M8.7 10.6c-.5 0-.9-.4-.9-.9s.4-.9.9-.9.9.4.9.9-.4.9-.9.9zm4.6 0c-.5 0-.9-.4-.9-.9s.4-.9.9-.9.9.4.9.9-.4.9-.9.9zM12 2C6.5 2 2 6.1 2 11.2c0 2.9 1.4 5.5 3.7 7.3l-.8 3.1 3.3-1.7c1 .3 2 .5 3 .5 5.5 0 10-4.1 10-9.2C22 6.1 17.5 2 12 2z"/>
+      </svg>
+      分享到微信
+    </button>
+  </div>
+
+  <div id="preview-modal">
+    <div class="modal-header">
+      文章预览
+      <button class="modal-close" onclick="closePreview()">✕ 关闭</button>
+    </div>
+    <div class="modal-body">
+      <h1 id="preview-title"></h1>
+      <div id="preview-text" class="article-text"></div>
+      <div id="preview-imgs" class="article-imgs"></div>
+    </div>
+  </div>
+
+  <div id="share-tip">
+    <div class="share-tip-box">
+      <div class="arrow-img">☝️</div>
+      <h3>点击右上角 "···" 分享</h3>
+      <p>在微信中，点击右上角的菜单按钮，<br>选择「发送给朋友」或「分享到朋友圈」</p>
+      <button class="share-tip-close" onclick="closeShareTip()">我知道了</button>
+    </div>
+  </div>
+
+  <script>
+    const imgInput = document.getElementById('img-input');
+    const imgPreview = document.getElementById('img-preview');
+    let uploadedImages = [];
+
+    imgInput.addEventListener('change', function () {
+      const files = Array.from(this.files);
+      files.forEach(file => {
+        const reader = new FileReader();
+        reader.onload = e => {
+          uploadedImages.push(e.target.result);
+          renderPreviews();
+        };
+        reader.readAsDataURL(file);
+      });
+      this.value = '';
+    });
+
+    function renderPreviews() {
+      imgPreview.innerHTML = uploadedImages.map((src, i) => `
+        <div class="prev-img">
+          <img src="${src}" alt="图片${i+1}">
+          <button class="del" onclick="removeImg(${i})">✕</button>
+        </div>
+      `).join('');
+    }
+
+    function removeImg(index) {
+      uploadedImages.splice(index, 1);
+      renderPreviews();
+    }
+
+    function showPreview() {
+      const title = document.getElementById('title-input').value || '（无标题）';
+      const body = document.getElementById('body-input').value || '（无内容）';
+      document.getElementById('preview-title').textContent = title;
+      document.getElementById('preview-text').textContent = body;
+      const imgsContainer = document.getElementById('preview-imgs');
+      imgsContainer.innerHTML = uploadedImages.map(src => `<img src="${src}" alt="图片">`).join('');
+      document.getElementById('preview-modal').style.display = 'block';
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closePreview() {
+      document.getElementById('preview-modal').style.display = 'none';
+      document.body.style.overflow = '';
+    }
+
+    function showShareTip() {
+      const title = document.getElementById('title-input').value.trim();
+      if (!title) {
+        alert('请先填写文章标题再分享哦 😊');
+        return;
+      }
+      document.title = title;
+      document.getElementById('share-tip').classList.add('show');
+    }
+
+    function closeShareTip() {
+      document.getElementById('share-tip').classList.remove('show');
+    }
+
+    document.getElementById('share-tip').addEventListener('click', function(e) {
+      if (e.target === this) closeShareTip();
+    });
+  </script>
+</body>
+</html>
